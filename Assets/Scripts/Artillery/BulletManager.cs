@@ -1,4 +1,4 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,7 +31,7 @@ public class BulletManager : MonoBehaviour
         enemy.HP -= 5;
         Destroy(gameObject);
         isHit = true;
-        Debug.Log($"¿ª§§ºƒ§H°I Hp: {enemy.HP}");
+        Debug.Log($"Êìä‰∏≠Êïµ‰∫∫ÔºÅ Hp: {enemy.HP}");
     }
 
     private bool IsFloorHit(Collider other)
