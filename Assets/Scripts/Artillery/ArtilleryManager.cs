@@ -5,15 +5,16 @@ using UnityEngine;
 public class ArtilleryManager : MonoBehaviour
 {
     public GameObject bulletPrefab;
-    private List<GameObject> enemyList = new List<GameObject>();
+    public List<GameObject> enemyList = new List<GameObject>();
     private readonly string enemyLayer = "Monster";
-    private float shootInterval = .1f;
-    private float bulletSpeed = 1f;
+    private readonly string rotatorTag = "Rotator";
+    private readonly float shootInterval = .1f;
+    private readonly float bulletSpeed = 1f;
     private bool isShooting = false;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer(enemyLayer))
+        if (other.gameObject.layer == LayerMask.NameToLayer(enemyLayer) && !other.CompareTag(rotatorTag))
         {
             enemyList.Add(other.gameObject);
         }
@@ -21,7 +22,7 @@ public class ArtilleryManager : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer(enemyLayer))
+        if (other.gameObject.layer == LayerMask.NameToLayer(enemyLayer) && !other.CompareTag(rotatorTag))
         {
             enemyList.Remove(other.gameObject);
         }
@@ -44,7 +45,7 @@ public class ArtilleryManager : MonoBehaviour
     {
         isShooting = true;
 
-        while (enemyList.Count > 0)
+        while (enemyList.Count > 0 && enemyList[0] != null)
         {
             GameObject targetEnemy = enemyList[0];
             Vector3 direction = targetEnemy.transform.position - transform.position;
@@ -60,12 +61,11 @@ public class ArtilleryManager : MonoBehaviour
 
     private IEnumerator MoveBullet(GameObject bullet, Vector3 direction)
     {
-        while (Vector3.Distance(bullet.transform.position, transform.position) < Vector3.Distance(direction, Vector3.zero))
+        //while (Vector3.Distance(bullet.transform.position, transform.position) < Vector3.Distance(direction, Vector3.zero))
+        while (bullet != null && !bullet.GetComponent<BulletManager>().isHit)
         {
             bullet.transform.Translate(bulletSpeed * Time.deltaTime * direction.normalized);
             yield return null;
         }
-
-        Destroy(bullet);
     }
 }

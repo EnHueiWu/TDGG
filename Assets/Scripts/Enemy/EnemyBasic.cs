@@ -34,10 +34,11 @@ public class EnemyBasic : MonoBehaviour
     private float attackTime = 1; // 怪物攻擊的時間
     private float poisonTime = 1; // 中毒扣血時間（每1秒扣1次，共扣5次）
     private float changeTime = 0.2f;
-    private bool isPoisoned; // 是否中毒
-    private bool isColorChanged = false;
-    private readonly string bullet = "Bullet";
-    private readonly string breakableWall = "Breakable Wall";
+    private bool isPoisoning; // 是否中毒
+    private bool isColorChange = false;
+    private bool isSetOriginalColor = false;
+    private readonly string bulletLayer = "Bullet";
+    private readonly string breakableWallLayer = "Breakable Wall";
     private Color originalColor;
 
     public void Awake()
@@ -75,35 +76,37 @@ public class EnemyBasic : MonoBehaviour
             Dead();
         }
 
-        if (isPoisoned) // 敵人中毒
+        if (isPoisoning) // 敵人中毒
         {
             poisonTime -= Time.deltaTime;
-            gameObject.GetComponent<MeshRenderer>().material.color = new Color(0.6f, 0.2f, 0.6f, 1);
+            ChangeEnemyColor(gameObject, new Color(0.6f, 0.2f, 0.6f, 1));
             // Debug.Log("time" + PoisonTime);
             if (poisonTime <= 0)
             {
                 HP -= 5;
-                Debug.Log(HP);
+                //Debug.Log("Current HP of " + gameObject.ToString() + " is " + HP);
                 poisonCount -= 1;
                 poisonTime = 1;
             }
 
             if (poisonCount <= 0)
             {
-                gameObject.GetComponent<MeshRenderer>().material.color = originalColor;
-                isPoisoned = false;
+                ChangeEnemyColor(gameObject, originalColor);
+                isPoisoning = false;
+                isSetOriginalColor = false;
                 poisonTime = 1;
             }
         }
 
-        if (isColorChanged) // 顏色改變（敵人受傷）
+        if (isColorChange) // 顏色改變（敵人受傷）
         {
             changeTime -= Time.deltaTime;
             if (changeTime <= 0)
             {
-                gameObject.GetComponent<MeshRenderer>().material.color = originalColor;
+                ChangeEnemyColor(gameObject, originalColor);
+                isSetOriginalColor = false;
                 changeTime = 0.2f;
-                isColorChanged = false;
+                isColorChange = false;
             }
         }
 
@@ -187,32 +190,38 @@ public class EnemyBasic : MonoBehaviour
 
     public void OnCollisionEnter(Collision other) // 碰撞
     {
-        Debug.Log("觸發碰撞事件");
+        //Debug.Log("觸發碰撞事件");
     }
 
     public void OnCollisionStay(Collision other) // 碰撞
     {
-        Debug.Log("持續碰撞" + other.gameObject);
-        if (other.gameObject.layer != LayerMask.NameToLayer(bullet))
+        //Debug.Log("持續碰撞" + other.gameObject);
+        if (other.gameObject.layer != LayerMask.NameToLayer(bulletLayer))
         {
             enemyAnimator.SetBool("Attack", true);
         }
-        originalColor = gameObject.GetComponent<MeshRenderer>().material.color;
+
+        if (isSetOriginalColor == false)
+        {
+            originalColor = gameObject.GetComponent<MeshRenderer>().material.color;
+            isSetOriginalColor = true;
+        }
         attackTime -= Time.deltaTime;
 
-        if (attackTime <= 0 && other.gameObject.layer == LayerMask.NameToLayer(breakableWall))
+        if (attackTime <= 0 && other.gameObject.layer == LayerMask.NameToLayer(breakableWallLayer))
         {
             switch (other.gameObject.tag)
             {
                 case "Burn":
                     other.gameObject.GetComponent<WallManager>().HP -= 1;
                     HP -= 10;
-                    gameObject.GetComponent<MeshRenderer>().material.color = new Color(1, 0.3f, 0.3f, 1);
-                    isColorChanged = true;
+                    originalColor = gameObject.GetComponent<MeshRenderer>().material.color;
+                    ChangeEnemyColor(gameObject, new Color(1, 0.3f, 0.3f, 1));
+                    isColorChange = true;
                     attackTime = 1;
                     break;
                 case "Poison":
-                    isPoisoned = true;
+                    isPoisoning = true;
                     poisonCount = 5;
                     other.gameObject.GetComponent<WallManager>().HP -= 1;
                     break;
@@ -224,7 +233,7 @@ public class EnemyBasic : MonoBehaviour
             enemyAnimator.SetBool("Attack", false);
         }
 
-        if ((other.gameObject.tag == "Burn" || other.gameObject.tag == "Poison" || other.gameObject.tag == "Normal") && other.gameObject.GetComponent<WallManager>().HP <= 0)
+        if ((other.gameObject.CompareTag("Burn") || other.gameObject.CompareTag("Poison") || other.gameObject.CompareTag("Normal")) && other.gameObject.GetComponent<WallManager>().HP <= 0)
         {
             attackTime = 1;
             enemyAnimator.SetBool("Attack", false);
@@ -237,12 +246,106 @@ public class EnemyBasic : MonoBehaviour
         enemyAnimator.SetBool("Attack", false);
     }
 
-    private void OnTriggerEnter(Collider other)
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    if (other.gameObject.layer == LayerMask.NameToLayer(bullet))
+    //    {
+    //        HP -= 5;
+    //        Debug.Log("擊中敵人！ Hp: " + HP);
+    //    }
+    //}
+
+    public void ChangeEnemyColor(GameObject enemy, Color color)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer(bullet))
+        switch (enemy.name)
         {
-            HP -= 5;
-            Debug.Log("擊中敵人！ Hp: " + HP);
+            case "NormalMinion(Clone)":
+                enemy.GetComponent<MeshRenderer>().material.color = color;
+                break;
+
+            case "SpeedMinion(Clone)":
+                enemy.GetComponent<MeshRenderer>().material.color = color;
+                for (int i = 1; i <= 2; i++)
+                {
+                    enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
+                }
+                break;
+
+            case "DefenseMinion(Clone)":
+                enemy.GetComponent<MeshRenderer>().material.color = color;
+                for (int i = 1; i <= 3; i++)
+                {
+                    enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
+                }
+                break;
+
+            case "NormalElite(Clone)":
+                enemy.GetComponent<MeshRenderer>().material.color = color;
+                break;
+
+            case "SpeedElite(Clone)":
+                enemy.GetComponent<MeshRenderer>().material.color = color;
+                for (int i = 1; i <= 2; i++)
+                {
+                    enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
+                }
+                break;
+
+            case "DefenseElite(Clone)":
+                enemy.GetComponent<MeshRenderer>().material.color = color;
+                for (int i = 1; i <= 3; i++)
+                {
+                    enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
+                }
+                break;
+
+            case "AttackSupreme(Clone)":
+                enemy.GetComponent<MeshRenderer>().material.color = color;
+                for (int i = 1; i <= 8; i++)
+                {
+                    enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
+                }
+                break;
+
+            case "SpeedSupreme(Clone)":
+                enemy.GetComponent<MeshRenderer>().material.color = color;
+                for (int i = 1; i <= 3; i++)
+                {
+                    enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
+                }
+                break;
+
+            case "DefenseSupreme(Clone)":
+                enemy.GetComponent<MeshRenderer>().material.color = color;
+                for (int i = 1; i <= 6; i++)
+                {
+                    enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
+                }
+                break;
+
+            case "AttackBoss(Clone)":
+                enemy.GetComponent<MeshRenderer>().material.color = color;
+                for (int i = 1; i <= 8; i++)
+                {
+                    enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
+                }
+                break;
+
+            case "SpeedBoss(Clone)":
+                enemy.GetComponent<MeshRenderer>().material.color = color;
+                for (int i = 1; i <= 3; i++)
+                {
+                    enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
+                }
+                break;
+
+            case "DefenseBoss(Clone)":
+                enemy.GetComponent<MeshRenderer>().material.color = color;
+                for (int i = 1; i <= 6; i++)
+                {
+                    enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
+                }
+                break;
         }
     }
 }

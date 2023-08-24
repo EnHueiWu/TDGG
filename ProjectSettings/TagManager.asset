@@ -8,6 +8,11 @@ TagManager:
   - Grid
   - Restart
   - Menu
+  - Normal
+  - Burn
+  - Poison
+  - Rotator
+  - Floor
   layers:
   - Default
   - TransparentFX
