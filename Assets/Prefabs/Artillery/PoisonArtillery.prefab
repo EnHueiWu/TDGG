@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1100245599907177827}
   - component: {fileID: -2506072073127827356}
   - component: {fileID: 272607469743696058}
+  - component: {fileID: -17840123710986465}
   m_Layer: 9
   m_Name: PoisonArtillery
   m_TagString: Untagged
@@ -135,3 +136,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 0
+--- !u!114 &-17840123710986465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3966250433300420475}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4059743de141a3f47ad743054da3855b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data: {fileID: 11400000, guid: fc7ad805c8a47be4db526325984158ed, type: 2}
+  bulletPrefab: {fileID: 3653768653190079916, guid: 142c75f6ca918f44082ff55761692fe8, type: 3}
+  enemyList: []
+  price: 40

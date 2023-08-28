@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Benchmark/LevelData")]
@@ -14,13 +13,13 @@ public class LevelData : ScriptableObject
     public int enemyQuantity;
 
     [Header("該關卡出現正常型態怪物數量")]
-    public int normalEnemy;
+    public int normalMinion;
 
     [Header("該關卡出現速度型態怪物數量")]
-    public int speedEnemy;
+    public int speedMinion;
 
     [Header("該關卡出現防禦型態怪物數量")]
-    public int defenseEnemy;
+    public int defenseMinion;
 
     [Header("該關卡出現菁英正常型態怪物數量")]
     public int normalElite;

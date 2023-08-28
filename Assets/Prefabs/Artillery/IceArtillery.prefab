@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6999419092923048062}
   - component: {fileID: 129095027846861782}
   - component: {fileID: 356138340936910712}
+  - component: {fileID: -8012598201154863061}
   m_Layer: 9
   m_Name: IceArtillery
   m_TagString: Untagged
@@ -135,3 +136,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 0
+--- !u!114 &-8012598201154863061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4390036449161159108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4059743de141a3f47ad743054da3855b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data: {fileID: 11400000, guid: 4d124ce4502223c42b2eacfdccc6e0b8, type: 2}
+  bulletPrefab: {fileID: 3653768653190079916, guid: 66e9613a6ddb40b428d58a444c5ae3cd, type: 3}
+  enemyList: []
+  price: 30

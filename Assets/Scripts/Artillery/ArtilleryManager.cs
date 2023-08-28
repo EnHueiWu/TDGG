@@ -5,7 +5,8 @@ using UnityEngine;
 public class ArtilleryManager : MonoBehaviour
 {
     public GameObject bulletPrefab;
-    public List<GameObject> enemyList = new List<GameObject>();
+    private List<GameObject> enemyList = new();
+    public int price;
     private readonly string enemyLayer = "Monster";
     private readonly string rotatorTag = "Rotator";
     private readonly float shootInterval = .1f;
@@ -61,7 +62,6 @@ public class ArtilleryManager : MonoBehaviour
 
     private IEnumerator MoveBullet(GameObject bullet, Vector3 direction)
     {
-        //while (Vector3.Distance(bullet.transform.position, transform.position) < Vector3.Distance(direction, Vector3.zero))
         while (bullet != null && !bullet.GetComponent<BulletManager>().isHit)
         {
             bullet.transform.Translate(bulletSpeed * Time.deltaTime * direction.normalized);

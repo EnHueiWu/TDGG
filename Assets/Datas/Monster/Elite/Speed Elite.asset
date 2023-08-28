@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c852ab494a5ab5c46b226feee69baab5, type: 3}
   m_Name: Speed Elite
   m_EditorClassIdentifier: 
-  EnemyName: "\u8FC5\u8DB3\u6578\u5B78\u4F7F\u8005 "
+  enemyName: "\u8FC5\u8DB3\u6578\u5B78\u4F7F\u8005"
   HP: 80
-  Speed: 0.2
+  speed: 0.2

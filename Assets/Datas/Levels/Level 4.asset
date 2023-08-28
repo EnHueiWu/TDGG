@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level: 4
   enemyQuantity: 50
-  normalEnemy: 20
-  speedEnemy: 9
-  defenseEnemy: 11
+  normalMinion: 20
+  speedMinion: 9
+  defenseMinion: 11
   normalElite: 5
   speedElite: 3
   defenseElite: 2

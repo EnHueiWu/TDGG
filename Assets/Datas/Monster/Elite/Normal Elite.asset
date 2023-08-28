@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c852ab494a5ab5c46b226feee69baab5, type: 3}
   m_Name: Normal Elite
   m_EditorClassIdentifier: 
-  EnemyName: "\u6578\u5B78\u6230\u58EB"
+  enemyName: "\u6578\u5B78\u6230\u58EB"
   HP: 200
-  Speed: 0.15
+  speed: 0.15

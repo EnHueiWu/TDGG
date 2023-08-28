@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c852ab494a5ab5c46b226feee69baab5, type: 3}
   m_Name: Defense Elite
   m_EditorClassIdentifier: 
-  EnemyName: "\u539A\u76AE\u6578\u5B78\u58EB\u5175"
+  enemyName: "\u539A\u76AE\u6578\u5B78\u58EB\u5175"
   HP: 300
-  Speed: 0.05
+  speed: 0.05

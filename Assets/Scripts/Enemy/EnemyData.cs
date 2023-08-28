@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Benchmark/EnemyData")]
@@ -8,9 +7,11 @@ using UnityEngine;
 public class EnemyData : ScriptableObject
 {
     [Header("怪物名稱")]
-    public string EnemyName;
+    public string enemyName;
+
     [Header("怪物血量"), Range(0, 2000)]
     public float HP;
+
     [Header("移動速度"), Range(0, 10)]
-    public float Speed;
+    public float speed;
 }

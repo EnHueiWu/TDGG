@@ -6,57 +6,59 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 [System.Serializable]
-public class BossSpawnData
+public class SupremeSpawnData
 {
-    public int waveNumber; // 特定波數
-    public GameObject bossPrefab; // 小Boss預製件
+    //特定波數
+    public int waveNumber;
+    //小Boss預製件
+    public GameObject supremePrefab;
 }
 
 public class LevelBasic : MonoBehaviour
 {
     public static LevelBasic Instance { get; private set; }
-    public BossSpawnData[] bossSpawnData;
-    public bool spawnedBoss;
+    public SupremeSpawnData[] supremeSpawnData;
+    private bool spawnedSupreme;
 
     #region 抓取檔案以及要被繼承的資料
     [Header("關卡資料結構")]
     public LevelData levelData;
 
-    [Header("要被資料繼承的怪物總數量")]//測試完畢後可以將要繼承的東西全部改成私有private
-    private int EnemyQuantity;
+    [Header("要被資料繼承的怪物總數量")]
+    private int enemyQuantity;
 
     [Header("要繼承出現正常型態怪物數量")]
-    private int NormalEnemy;
+    private int normalEnemy;
 
     [Header("要繼承出現速度型態怪物數量")]
-    private int SpeedEnemy;
+    private int speedEnemy;
 
     [Header("要繼承出現防禦型態怪物數量")]
-    private int DefendEnemy;
+    private int defenseEnemy;
 
     [Header("要繼承出現菁英正常型態怪物數量")]
-    private int NormalElite;
+    private int normalElite;
 
     [Header("該關卡出現菁英速度型態怪物數量")]
-    private int SpeedElite;
+    private int speedElite;
 
     [Header("該關卡出現菁英防禦型態怪物數量")]
-    private int DefendElite;
+    private int defenseElite;
 
     [Header("該關卡出現的Boss")]
-    public GameObject Boss;
+    public GameObject boss;
 
     [Header("關卡波數")]
     public int wave;
 
     [Header("波數怪物數量陣列")]
-    public int[] EnemyWave;
+    public int[] enemyWave;
 
     [Header("關卡核心血量")]
-    public int CoreHP;
+    public int coreHP;
 
     [Header("關卡金幣")]
-    public int Coin;
+    public int coin;
     #endregion
 
     #region UI物件
@@ -112,18 +114,20 @@ public class LevelBasic : MonoBehaviour
     // 5 菁英防禦型態怪物
     //小Boss與Boss另外寫法
     [Header("怪物預置物陣列，腳本內有詳細順序，共需要6格，不包含小Boss")]
-    public GameObject[] Monsters = new GameObject[6];
+    public GameObject[] monsters = new GameObject[6];
 
     [Header("怪物生成點，如果該關卡只有1個重生點複製同樣位置，改名就好")]
-    private GameObject MonsterSpawnPointA, MonsterSpawnPointB, MonsterSpawnPointC;
+    private GameObject monsterSpawnPointA, monsterSpawnPointB, monsterSpawnPointC;
     #endregion
 
     #region 核心、砲台、城牆
     //public GameObject Core;
     #endregion
-
-    float countdownTime = 10f; // 倒數計時的秒數，這裡設定為 10秒
-    bool countdownStart; //倒數計時開始布林
+    
+    //倒數計時的秒數，這裡設定為 10秒
+    private float countdownTime = 10f;
+    //倒數計時開始布林
+    private bool countdownStart;
 
     private void Awake()
     {
@@ -134,18 +138,18 @@ public class LevelBasic : MonoBehaviour
         Time.timeScale = 1f;
 
         #region 該處是繼承資料
-        this.EnemyQuantity = levelData.enemyQuantity;
-        this.NormalEnemy = levelData.normalEnemy;
-        this.SpeedEnemy = levelData.speedEnemy;
-        this.DefendEnemy = levelData.defenseEnemy;
-        this.NormalElite = levelData.normalElite;
-        this.SpeedElite = levelData.speedElite;
-        this.DefendElite = levelData.defenseElite;
-        this.Boss = levelData.boss;
-        this.wave = levelData.wave;
-        this.EnemyWave = levelData.enemyWave;
-        this.CoreHP = levelData.coreHP;
-        this.Coin = levelData.coin;
+        enemyQuantity = levelData.enemyQuantity;
+        normalEnemy = levelData.normalMinion;
+        speedEnemy = levelData.speedMinion;
+        defenseEnemy = levelData.defenseMinion;
+        normalElite = levelData.normalElite;
+        speedElite = levelData.speedElite;
+        defenseElite = levelData.defenseElite;
+        boss = levelData.boss;
+        wave = levelData.wave;
+        enemyWave = levelData.enemyWave;
+        coreHP = levelData.coreHP;
+        coin = levelData.coin;
         #endregion
 
         #region UI按鈕、介面 靠程式抓取   這個需要全部開啟才能被抓取，如果關閉會抓取不到
@@ -167,12 +171,15 @@ public class LevelBasic : MonoBehaviour
         closeButton = GameObject.Find("Close").GetComponent<Button>();
         restart = GameObject.FindGameObjectsWithTag("Restart");
         restartButton = new Button[restart.Length];
+
         for (int i = 0; i < restart.Length; i++)
         {
             restartButton[i] = restart[i].GetComponent<Button>();
         }
+
         menu = GameObject.FindGameObjectsWithTag("Menu");
         menuButton = new Button[menu.Length];
+
         for (int i = 0; i < menu.Length; i++)
         {
             menuButton[i] = menu[i].GetComponent<Button>();
@@ -180,23 +187,25 @@ public class LevelBasic : MonoBehaviour
         #endregion
 
         #region 陣列抓取敵人數量、設定怪物重生點
-        MonsterSpawnPointA = GameObject.Find("SpawnPointA");
-        MonsterSpawnPointB = GameObject.Find("SpawnPointB");
-        MonsterSpawnPointC = GameObject.Find("SpawnPointC");
+        monsterSpawnPointA = GameObject.Find("SpawnPointA");
+        monsterSpawnPointB = GameObject.Find("SpawnPointB");
+        monsterSpawnPointC = GameObject.Find("SpawnPointC");
+
         // 先將可用的怪物類型加入到 availableEnemies 中
         remainingEnemies = new int[6];
-        remainingEnemies[0] = this.NormalEnemy;
-        remainingEnemies[1] = this.SpeedEnemy;
-        remainingEnemies[2] = this.DefendEnemy;
-        remainingEnemies[3] = this.NormalElite;
-        remainingEnemies[4] = this.SpeedElite;
-        remainingEnemies[5] = this.DefendElite;
-        if (NormalEnemy > 0) availableEnemies.Add(0);
-        if (SpeedEnemy > 0) availableEnemies.Add(1);
-        if (DefendEnemy > 0) availableEnemies.Add(2);
-        if (NormalElite > 0) availableEnemies.Add(3);
-        if (SpeedElite > 0) availableEnemies.Add(4);
-        if (DefendElite > 0) availableEnemies.Add(5);
+        remainingEnemies[0] = normalEnemy;
+        remainingEnemies[1] = speedEnemy;
+        remainingEnemies[2] = defenseEnemy;
+        remainingEnemies[3] = normalElite;
+        remainingEnemies[4] = speedElite;
+        remainingEnemies[5] = defenseElite;
+
+        if (normalEnemy > 0) availableEnemies.Add(0);
+        if (speedEnemy > 0) availableEnemies.Add(1);
+        if (defenseEnemy > 0) availableEnemies.Add(2);
+        if (normalElite > 0) availableEnemies.Add(3);
+        if (speedElite > 0) availableEnemies.Add(4);
+        if (defenseElite > 0) availableEnemies.Add(5);
         #endregion
     }
 
@@ -214,10 +223,12 @@ public class LevelBasic : MonoBehaviour
         nextWaveButton.onClick.AddListener(ClickNextWave);
         pauseButton.onClick.AddListener(ClickStopButtom);
         closeButton.onClick.AddListener(ClickStopButtom);
+
         for (int i = 0; i < restartButton.Length; i++)
         {
             restartButton[i].onClick.AddListener(ResetLevel);
         }
+
         for (int i = 0; i < menuButton.Length; i++)
         {
             menuButton[i].onClick.AddListener(ToMenu);
@@ -233,13 +244,19 @@ public class LevelBasic : MonoBehaviour
         #region 外掛
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            CoreHP = 100;
+            coreHP = 100;
             UpdateCoreHP();
+        }
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            coin = 1000;
+            UpdateCoinWallet();
         }
         #endregion
 
         #region 波數倒數計時器
-        if (countdownStart && !OpenStopPanel)
+        if (countdownStart && !isPausePanelOpen)
         {
             countdownText.gameObject.SetActive(true);
             int seconds;
@@ -248,6 +265,7 @@ public class LevelBasic : MonoBehaviour
             // 將秒數轉換為字串形式，並顯示在 UI 上
             countdownText.text = "下一波時間倒數：" + string.Format("{0:00}", seconds);
         }
+
         else
         {
             countdownText.gameObject.SetActive(false);
@@ -255,7 +273,7 @@ public class LevelBasic : MonoBehaviour
         #endregion
 
         #region 核心血量判斷
-        if (CoreHP <= 0)
+        if (coreHP <= 0)
         {
             losePanel.SetActive(true);
             Time.timeScale = 0;
@@ -264,12 +282,13 @@ public class LevelBasic : MonoBehaviour
     }
 
     [Header("目前第幾波")]
-    public int currentWave = 0; // 目前的波數索引
+    public int currentWave = 0; //目前的波數索引
+
     [Header("每種怪物剩餘的數量")]
-    public int[] remainingEnemies;   // 儲存每種怪物剩餘的數量
+    public int[] remainingEnemies;   //儲存每種怪物剩餘的數量
 
     [Header("當每種怪物數量>0時該處便會擁有陣列")]
-    public List<int> availableEnemies = new List<int>();
+    public List<int> availableEnemies = new();
 
     public float[] enemySpawnProbabilities;
 
@@ -278,7 +297,7 @@ public class LevelBasic : MonoBehaviour
     {
         if (currentWave < wave)
         {
-            int totalEnemies = EnemyWave[currentWave];
+            int totalEnemies = enemyWave[currentWave];
 
             // 計算每個敵人類型的生成機率
             enemySpawnProbabilities = new float[remainingEnemies.Length];
@@ -301,13 +320,13 @@ public class LevelBasic : MonoBehaviour
                     switch (spawnPointIndex)
                     {
                         case 0:
-                            spawnPosition = MonsterSpawnPointA.transform.position;
+                            spawnPosition = monsterSpawnPointA.transform.position;
                             break;
                         case 1:
-                            spawnPosition = MonsterSpawnPointB.transform.position;
+                            spawnPosition = monsterSpawnPointB.transform.position;
                             break;
                         case 2:
-                            spawnPosition = MonsterSpawnPointC.transform.position;
+                            spawnPosition = monsterSpawnPointC.transform.position;
                             break;
                         default:
                             spawnPosition = Vector3.zero; // 預設位置
@@ -331,42 +350,41 @@ public class LevelBasic : MonoBehaviour
                     {
                         case 0:
                             // 生成正常型態怪物
-                            InstantiateEnemy(Monsters[0], spawnPosition);
+                            InstantiateEnemy(monsters[0], spawnPosition);
                             // 減去剩餘數量
                             remainingEnemies[0]--;
                             break;
                         case 1:
                             // 生成速度型態怪物
-                            InstantiateEnemy(Monsters[1], spawnPosition);
+                            InstantiateEnemy(monsters[1], spawnPosition);
                             // 減去剩餘數量
                             remainingEnemies[1]--;
                             break;
                         case 2:
                             // 生成防禦型態怪物
-                            InstantiateEnemy(Monsters[2], spawnPosition);
+                            InstantiateEnemy(monsters[2], spawnPosition);
                             // 減去剩餘數量
                             remainingEnemies[2]--;
                             break;
                         case 3:
                             // 生成正常型態的菁英怪物
-                            InstantiateEnemy(Monsters[3], spawnPosition);
+                            InstantiateEnemy(monsters[3], spawnPosition);
                             // 減去剩餘數量
                             remainingEnemies[3]--;
                             break;
                         case 4:
                             // 生成速度型態的菁英怪物
-                            InstantiateEnemy(Monsters[4], spawnPosition);
+                            InstantiateEnemy(monsters[4], spawnPosition);
                             // 減去剩餘數量
                             remainingEnemies[4]--;
                             break;
                         case 5:
                             // 生成防禦型態的菁英怪物
-                            InstantiateEnemy(Monsters[5], spawnPosition);
+                            InstantiateEnemy(monsters[5], spawnPosition);
                             // 減去剩餘數量
                             remainingEnemies[5]--;
                             break;
                     }
-
 
                     // 更新機率總和
                     totalProbability = 0;
@@ -376,59 +394,58 @@ public class LevelBasic : MonoBehaviour
                         enemySpawnProbabilities[j] = totalProbability;
                     }
 
-                    if (ShouldSpawnBoss(currentWave) && !spawnedBoss) // 檢查是否需要生成小Boss
+                    if (ShouldSpawnSupreme(currentWave) && !spawnedSupreme) // 檢查是否需要生成小Boss
                     {
                         Debug.LogWarning("我有生成小Boss喔");
-                        GameObject bossPrefab = GetBossPrefabForWave(currentWave);
-                        InstantiateEnemy(bossPrefab, spawnPosition);
-                        spawnedBoss = true;
+                        GameObject supremePrefab = GetSupremePrefabForWave(currentWave);
+                        InstantiateEnemy(supremePrefab, spawnPosition);
+                        spawnedSupreme = true;
                     }
 
-                    // 如果該類型的怪物剩餘數量為0，從可用怪物列表中移除
+                    //如果該類型的怪物剩餘數量為0，從可用怪物列表中移除
                     if (remainingEnemies[enemyType] == 0)
                     {
                         availableEnemies.Remove(enemyType);
                     }
+
                     yield return new WaitForSeconds(0.5f);
                 }
 
                 else
                 {
-                    print("我應該跑不到這裡，我在這除錯用");
+                    //print("我應該跑不到這裡，我在這除錯用");
                 }
             }
 
             if (availableEnemies.Count != 0)
             {
-                print("怪物還有你還可以在執行");
+                //print("怪物還有你還可以在執行");
                 WaveCompleted();
                 currentWave++;
-                // 在生成完怪物後，將 spawnedBoss 設為 false
-                spawnedBoss = false;
+                //在生成完怪物後，將 spawnedBoss 設為 false
+                spawnedSupreme = false;
                 //UpdateWave();
             }
 
             else
             {
-                // 隨機選擇一個生成位置，可以是兩個點位中的一個
-                Vector3 spawnPosition = Random.Range(0, 2) == 0 ? MonsterSpawnPointA.transform.position : MonsterSpawnPointB.transform.position;
-                print("我要生成Boss");
-                InstantiateEnemy(Boss, spawnPosition);
+                //隨機選擇一個生成位置，可以是兩個點位中的一個
+                Vector3 spawnPosition = Random.Range(0, 2) == 0 ? monsterSpawnPointA.transform.position : monsterSpawnPointB.transform.position;
+                //print("我要生成Boss");
+                InstantiateEnemy(boss, spawnPosition);
                 //print(spawnPosition);
             }
         }
     }
 
-    Coroutine NextCoroutine;
-    Coroutine WaveWaitCoroutine;
+    private Coroutine NextCoroutine;
+    private Coroutine WaveWaitCoroutine;
 
-    // 呼叫此方法開始遊戲
+    //呼叫此方法開始遊戲
     public void StartGame()
     {
-        //currentWave = 0;
         UpdateWave();
         NextCoroutine = StartCoroutine(SpawnNextWave());
-        //a =StartCoroutine(我是測試協成());
         start.SetActive(false);
         nextWave.SetActive(false);
         Time.timeScale = 1f;
@@ -442,7 +459,7 @@ public class LevelBasic : MonoBehaviour
         monsterPrefab.transform.parent = rotatorPrefab.transform;
     }
 
-    // 呼叫此方法在怪物生成後，減去生成的數量，如果某種怪物的數量已經為0，表示不再生成此種怪物
+    //呼叫此方法在怪物生成後，減去生成的數量，如果某種怪物的數量已經為0，表示不再生成此種怪物
     public void ReduceRemainingEnemies(int normal, int speed, int defend, int normalElite, int speedElite, int defendElite)
     {
         remainingEnemies[0] -= normal;
@@ -453,7 +470,7 @@ public class LevelBasic : MonoBehaviour
         remainingEnemies[5] -= defendElite;
     }
 
-    // 呼叫此方法判斷是否還有剩餘怪物可以生成
+    //呼叫此方法判斷是否還有剩餘怪物可以生成
     public bool HasRemainingEnemies()
     {
         foreach (int count in remainingEnemies)
@@ -463,16 +480,17 @@ public class LevelBasic : MonoBehaviour
                 return true;
             }
         }
+
         return false;
     }
 
-    // 呼叫此方法在下一波的怪物數量為0時進行等待，然後生成下一波怪物
+    //呼叫此方法在下一波的怪物數量為0時進行等待，然後生成下一波怪物
     public void WaveCompleted()
     {
         WaveWaitCoroutine= StartCoroutine(WaitAndSpawnNextWave());
     }
 
-    // 等待一段時間後生成下一波怪物
+    //等待一段時間後生成下一波怪物
     private IEnumerator WaitAndSpawnNextWave()
     {
         if (countdownTime > 0)
@@ -481,9 +499,11 @@ public class LevelBasic : MonoBehaviour
             nextWave.SetActive(true);
             waveDisplay.SetActive(false);
         }
-        yield return new WaitForSeconds(10f); // 等待10秒，你可以自行調整等待時間
 
-        // 停止 SpawnNextWave 協程（如果在這期間已經啟動）
+        //等待10秒，你可以自行調整等待時間
+        yield return new WaitForSeconds(10f);
+
+        //停止SpawnNextWave協程（如果在這期間已經啟動）
         StopCoroutine(NextCoroutine);
         NextCoroutine = StartCoroutine(SpawnNextWave());
         countdownTime = 10;
@@ -493,27 +513,29 @@ public class LevelBasic : MonoBehaviour
     }
 
     #region 判斷生成小Boss
-    private bool ShouldSpawnBoss(int waveNumber)
+    private bool ShouldSpawnSupreme(int waveNumber)
     {
-        foreach (var bossData in bossSpawnData)
+        foreach (var supremeData in supremeSpawnData)
         {
-            if (bossData.waveNumber == waveNumber)
+            if (supremeData.waveNumber == waveNumber)
             {
                 return true;
             }
         }
+
         return false;
     }
 
-    private GameObject GetBossPrefabForWave(int waveNumber)
+    private GameObject GetSupremePrefabForWave(int waveNumber)
     {
-        foreach (var bossData in bossSpawnData)
+        foreach (var supremeData in supremeSpawnData)
         {
-            if (bossData.waveNumber == waveNumber)
+            if (supremeData.waveNumber == waveNumber)
             {
-                return bossData.bossPrefab;
+                return supremeData.supremePrefab;
             }
         }
+
         return null;
     }
     #endregion
@@ -522,7 +544,7 @@ public class LevelBasic : MonoBehaviour
     ///更新金幣
     public void UpdateCoinWallet()
     {
-        coinText.text = Coin.ToString();
+        coinText.text = coin.ToString();
     }
 
     public void UpdateWave()
@@ -533,30 +555,32 @@ public class LevelBasic : MonoBehaviour
 
     public void UpdateCoreHP()
     {
-        HPtext.text = CoreHP.ToString();
+        HPtext.text = coreHP.ToString();
     }
     #endregion
 
     #region 按鈕類腳本，內包含暫停介面按鈕、下一波、回到主選單、重新遊玩
-    bool OpenStopPanel = false;
+    private bool isPausePanelOpen = false;
 
     public void ClickStopButtom()
     {
-        OpenStopPanel = !OpenStopPanel;
-        pausePanel.SetActive(OpenStopPanel);
+        isPausePanelOpen = !isPausePanelOpen;
+        pausePanel.SetActive(isPausePanelOpen);
 
-        if (OpenStopPanel)
+        if (isPausePanelOpen)
         {
             Time.timeScale = 0;
         }
+
         else
         {
             Time.timeScale = 1;
         }
     }
+
     public void ClickNextWave()
     {
-        print("開始下一波");
+        //print("開始下一波");
         //暫停倒數下一波協成
         StopCoroutine(WaveWaitCoroutine);
         StopCoroutine(NextCoroutine);

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c852ab494a5ab5c46b226feee69baab5, type: 3}
   m_Name: Lv.9 Defense Supreme
   m_EditorClassIdentifier: 
-  EnemyName: "\u5C0F\u5805\u97CC\u5DE8\u7378"
+  enemyName: "\u5C0F\u5805\u97CC\u5DE8\u7378"
   HP: 600
-  Speed: 0.7
+  speed: 0.7

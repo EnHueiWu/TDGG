@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c852ab494a5ab5c46b226feee69baab5, type: 3}
   m_Name: Lv.5 Attack Supreme
   m_EditorClassIdentifier: 
-  EnemyName: "\u5C0F\u7834\u58DE\u8005"
+  enemyName: "\u5C0F\u7834\u58DE\u8005"
   HP: 300
-  Speed: 0.5
+  speed: 0.5

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4302326601539226583}
   - component: {fileID: 7421723631012700715}
   - component: {fileID: -370903087003573922}
+  - component: {fileID: 7493130398950283323}
   m_Layer: 10
   m_Name: PoisonBullet
   m_TagString: Untagged
@@ -238,3 +239,17 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
+--- !u!114 &7493130398950283323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3653768653190079916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1eaafaa1db5a933418d768734ea60151, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  effect: {fileID: 2333597752148496740, guid: b177800f7ab63434f8de88c2c8b5f5fd, type: 3}
+  isHit: 0

@@ -13,6 +13,7 @@ TagManager:
   - Poison
   - Rotator
   - Floor
+  - Base
   layers:
   - Default
   - TransparentFX

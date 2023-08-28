@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c852ab494a5ab5c46b226feee69baab5, type: 3}
   m_Name: Defense Minion
   m_EditorClassIdentifier: 
-  EnemyName: "\u539A\u76AE\u5C0F\u6578\u5B78 "
+  enemyName: "\u539A\u76AE\u5C0F\u6578\u5B78"
   HP: 80
-  Speed: 0.1
+  speed: 0.1

@@ -45,7 +45,7 @@ public class EnemyBasic : MonoBehaviour
     {
         levelBasic = FindObjectOfType<LevelBasic>();
         HP = data.HP;
-        speed = data.Speed;
+        speed = data.speed;
     }
 
     private void Start()
@@ -138,14 +138,14 @@ public class EnemyBasic : MonoBehaviour
         {
             if (monsterType == MonsterType.Boss)
             {
-                levelBasic.CoreHP -= 10;
+                levelBasic.coreHP -= 10;
                 levelBasic.UpdateCoreHP();
                 Destroy(transform.parent.gameObject);
             }
 
             else
             {
-                levelBasic.CoreHP--;
+                levelBasic.coreHP--;
                 levelBasic.UpdateCoreHP();
                 Destroy(transform.parent.gameObject);
             }
@@ -160,28 +160,28 @@ public class EnemyBasic : MonoBehaviour
     {
         if (monsterType == MonsterType.Minion)
         {
-            levelBasic.Coin += 10;
+            levelBasic.coin += 10;
             levelBasic.UpdateCoinWallet();
             Destroy(transform.parent.gameObject);
         }
 
         else if (monsterType == MonsterType.Elite)
         {
-            levelBasic.Coin += 20;
+            levelBasic.coin += 20;
             levelBasic.UpdateCoinWallet();
             Destroy(transform.parent.gameObject);
         }
 
         else if (monsterType == MonsterType.Supreme)
         {
-            levelBasic.Coin += 100;
+            levelBasic.coin += 100;
             levelBasic.UpdateCoinWallet();
             Destroy(transform.parent.gameObject);
         }
 
         else if (monsterType == MonsterType.Boss)
         {
-            print("我打敗Boss了，我可以通關了");
+            //print("我打敗Boss了，我可以通關了");
             levelBasic.winPanel.SetActive(true);
             Time.timeScale = 0f;
             Destroy(transform.parent.gameObject);
@@ -245,15 +245,6 @@ public class EnemyBasic : MonoBehaviour
         attackTime = 1;
         enemyAnimator.SetBool("Attack", false);
     }
-
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    if (other.gameObject.layer == LayerMask.NameToLayer(bullet))
-    //    {
-    //        HP -= 5;
-    //        Debug.Log("擊中敵人！ Hp: " + HP);
-    //    }
-    //}
 
     public void ChangeEnemyColor(GameObject enemy, Color color)
     {

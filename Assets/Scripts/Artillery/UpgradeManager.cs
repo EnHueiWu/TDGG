@@ -6,14 +6,17 @@ using UnityEngine.UI;
 
 public class UpgradeManager : MonoBehaviour
 {
-    private GameObject upgradeCanvas, upgradePanel;
+    private LevelBasic levelBasic;
+    private GameObject upgradeCanvas, upgradePanel, upgradedArtillery;
     public GameObject advancedArtillery, poisonArtillery, iceArtillery;
     private Button selfUpgradeButton, specialUpgradeButton, advancedUpgradeButton, poisonUpgradeButton, iceUpgradeButton;
     private readonly float offset = 0.098f;
     private readonly string artilleryLayer = "Artillery";
+    public int hierarchyLevel;
 
     private void Awake()
     {
+        levelBasic = FindObjectOfType<LevelBasic>();
         upgradeCanvas = GameObject.Find("UpgradeCanvas");
         upgradePanel = upgradeCanvas.transform.Find("UpgradePanel").gameObject;
         selfUpgradeButton = upgradePanel.transform.Find("SelfUpgrade").gameObject.GetComponent<Button>();
@@ -29,25 +32,45 @@ public class UpgradeManager : MonoBehaviour
         advancedUpgradeButton.gameObject.SetActive(false);
         poisonUpgradeButton.gameObject.SetActive(false);
         iceUpgradeButton.gameObject.SetActive(false);
-        selfUpgradeButton.onClick.AddListener(SelfUpgrade);
-        specialUpgradeButton.onClick.AddListener(SpecialUpgrade);
-        advancedUpgradeButton.onClick.AddListener(() => Upgrade(advancedArtillery));
-        poisonUpgradeButton.onClick.AddListener(() => Upgrade(poisonArtillery));
-        iceUpgradeButton.onClick.AddListener(() => Upgrade(iceArtillery));
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && (!EventSystem.current.IsPointerOverGameObject() || EventSystem.current.currentSelectedGameObject == null)) upgradePanel.SetActive(false);
+        if (Input.GetMouseButtonDown(0) && (!EventSystem.current.IsPointerOverGameObject() || EventSystem.current.currentSelectedGameObject == null))
+        {
+            upgradePanel.SetActive(false);
+            advancedUpgradeButton.gameObject.SetActive(false);
+            poisonUpgradeButton.gameObject.SetActive(false);
+            iceUpgradeButton.gameObject.SetActive(false);
+            selfUpgradeButton.onClick.RemoveAllListeners();
+            specialUpgradeButton.onClick.RemoveAllListeners();
+            advancedUpgradeButton.onClick.RemoveAllListeners();
+            poisonUpgradeButton.onClick.RemoveAllListeners();
+            iceUpgradeButton.onClick.RemoveAllListeners();
+        }
     }
 
     private void OnMouseUp()
     {
-        if (gameObject.layer == LayerMask.NameToLayer(artilleryLayer) && IsNotCapsuleCollider())
+        if (!EventSystem.current.IsPointerOverGameObject())
         {
-            Vector2 ViewportPosition = RectTransformUtility.WorldToScreenPoint(Camera.main, transform.position);
-            upgradePanel.GetComponent<RectTransform>().position = ViewportPosition;
-            upgradePanel.SetActive(true);
+            selfUpgradeButton.onClick.RemoveAllListeners();
+            specialUpgradeButton.onClick.RemoveAllListeners();
+            advancedUpgradeButton.onClick.RemoveAllListeners();
+            poisonUpgradeButton.onClick.RemoveAllListeners();
+            iceUpgradeButton.onClick.RemoveAllListeners();
+            if (gameObject.layer == LayerMask.NameToLayer(artilleryLayer) && IsNotCapsuleCollider())
+            {
+                upgradedArtillery = gameObject;
+                Vector2 ViewportPosition = RectTransformUtility.WorldToScreenPoint(Camera.main, transform.position);
+                upgradePanel.GetComponent<RectTransform>().position = ViewportPosition;
+                upgradePanel.SetActive(true);
+                selfUpgradeButton.onClick.AddListener(() => SelfUpgrade(upgradedArtillery));
+                specialUpgradeButton.onClick.AddListener(SpecialUpgrade);
+                advancedUpgradeButton.onClick.AddListener(() => Upgrade(upgradedArtillery, advancedArtillery));
+                poisonUpgradeButton.onClick.AddListener(() => Upgrade(upgradedArtillery, poisonArtillery));
+                iceUpgradeButton.onClick.AddListener(() => Upgrade(upgradedArtillery, iceArtillery));
+            }
         }
     }
 
@@ -57,11 +80,24 @@ public class UpgradeManager : MonoBehaviour
         return Physics.Raycast(ray, out RaycastHit hit) && hit.collider is not CapsuleCollider;
     }
 
-    private void SelfUpgrade()
+    private void SelfUpgrade(GameObject artillery)
     {
-        GameObject instantiatedArtillery = Instantiate(gameObject, transform.position + new Vector3(0, offset, 0), Quaternion.identity);
-        instantiatedArtillery.transform.SetParent(transform);
+        if (hierarchyLevel < 4)
+        {
+            GameObject instantiatedArtillery = Instantiate(artillery, artillery.transform.position + new Vector3(0, offset, 0), Quaternion.identity);
+            instantiatedArtillery.transform.SetParent(artillery.transform);
+            instantiatedArtillery.GetComponent<UpgradeManager>().hierarchyLevel = AccessHierarchyLevel(instantiatedArtillery.transform);
+            int price = artillery.GetComponent<ArtilleryManager>().price;
+            levelBasic.coin -= price;
+            levelBasic.UpdateCoinWallet();
+        }
+
         upgradePanel.SetActive(false);
+        selfUpgradeButton.onClick.RemoveAllListeners();
+        specialUpgradeButton.onClick.RemoveAllListeners();
+        advancedUpgradeButton.onClick.RemoveAllListeners();
+        poisonUpgradeButton.onClick.RemoveAllListeners();
+        iceUpgradeButton.onClick.RemoveAllListeners();
     }
 
     private void SpecialUpgrade()
@@ -71,10 +107,36 @@ public class UpgradeManager : MonoBehaviour
         iceUpgradeButton.gameObject.SetActive(true);
     }
 
-    private void Upgrade(GameObject upgradePrefab)
+    private void Upgrade(GameObject artillery, GameObject upgradePrefab)
     {
-        Instantiate(upgradePrefab, transform.position, transform.rotation);
-        Destroy(gameObject);
+        if (hierarchyLevel < 1)
+        {
+            Instantiate(upgradePrefab, artillery.transform.position, artillery.transform.rotation);
+            Destroy(artillery);
+            int price = upgradePrefab.GetComponent<ArtilleryManager>().price;
+            levelBasic.coin -= price;
+            levelBasic.UpdateCoinWallet();
+        }
+
         upgradePanel.SetActive(false);
+        selfUpgradeButton.onClick.RemoveAllListeners();
+        specialUpgradeButton.onClick.RemoveAllListeners();
+        advancedUpgradeButton.onClick.RemoveAllListeners();
+        poisonUpgradeButton.onClick.RemoveAllListeners();
+        iceUpgradeButton.onClick.RemoveAllListeners();
+    }
+
+    private int AccessHierarchyLevel(Transform artilleryTransform)
+    {
+        int level = 1;
+        Transform upperLavelTransform = artilleryTransform;
+
+        while (upperLavelTransform.parent != null)
+        {
+            level++;
+            upperLavelTransform = upperLavelTransform.parent;
+        }
+
+        return level;
     }
 }

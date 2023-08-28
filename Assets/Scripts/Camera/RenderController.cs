@@ -15,16 +15,10 @@ public class RenderController : MonoBehaviour
     {
         renderModel = transform.Find(modelName).gameObject;
         renderCamera = transform.Find(cameraName).GetComponent<Camera>();
-        instantiateButton.onClick.AddListener(SwitchDirection);
     }
 
     private void Update()
     {
-        if (ViewController.isCameraRotating) renderCamera.transform.RotateAround(renderModel.transform.position, Vector3.up, ViewController.mouseX * ViewController.rotationSpeed);
-    }
-
-    private void SwitchDirection()
-    {
-        renderModel.transform.Rotate(Vector3.up, 90f);
+        if (ViewController.canCameraRotating) renderCamera.transform.RotateAround(renderModel.transform.position, Vector3.up, ViewController.mouseX * ViewController.rotationSpeed);
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BulletManager : MonoBehaviour
 {
+    public GameObject effect;
     private const string monsterLayer = "Monster";
     private const string floorTag = "Floor";
     public bool isHit = false;
@@ -22,16 +23,18 @@ public class BulletManager : MonoBehaviour
 
     private bool IsMonsterHit(Collider other)
     {
-        return other.gameObject.layer == LayerMask.NameToLayer(monsterLayer) && other.TryGetComponent(out EnemyBasic enemy);
+        return other.gameObject.layer == LayerMask.NameToLayer(monsterLayer) && other.TryGetComponent(out EnemyBasic _);
     }
 
     private void HitMonster(Collider other)
     {
         EnemyBasic enemy = other.GetComponent<EnemyBasic>();
         enemy.HP -= 5;
+        var effect_temp = Instantiate(effect, other.transform.position, Quaternion.identity);
         Destroy(gameObject);
+        Destroy(effect_temp, 1f);
         isHit = true;
-        Debug.Log($"擊中敵人！ Hp: {enemy.HP}");
+        //Debug.Log($"擊中敵人！ Hp: {enemy.HP}");
     }
 
     private bool IsFloorHit(Collider other)
