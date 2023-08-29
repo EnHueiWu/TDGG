@@ -251,5 +251,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1eaafaa1db5a933418d768734ea60151, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bulletType: 3
   effect: {fileID: 2333597752148496740, guid: b177800f7ab63434f8de88c2c8b5f5fd, type: 3}
+  shootInterval: 0
+  bulletSpeed: 0
+  damage: 0
   isHit: 0

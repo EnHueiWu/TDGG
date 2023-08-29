@@ -7,34 +7,30 @@ public class WallManager : MonoBehaviour
     public WallType wallType;
     public int HP;
 
-    private void Start()
+    private void Awake()
     {
-        if (wallType == WallType.BurnWall)
+        switch(wallType)
         {
-            HP = 1;
-        }
-
-        else if (wallType == WallType.NormalWall)
-        {
-            HP = 5;
-        }
-
-        else if (wallType == WallType.PoisonWall)
-        {
-            HP = 2;
-        }
-
-        else
-        {
-            print("我沒抓到城牆Type");
+            case WallType.BurnWall:
+                HP = 1;
+                break;
+            
+            case WallType.NormalWall:
+                HP = 5;
+                break;
+            
+            case WallType.PoisonWall:
+                HP = 2;
+                break;
+            
+            default:
+                Debug.LogWarning("Wall type not found!");
+                break;
         }
     }
 
     private void Update()
     {
-        if (HP <= 0)
-        {
-            Destroy(gameObject);
-        }
+        if (HP <= 0) Destroy(gameObject);
     }
 }

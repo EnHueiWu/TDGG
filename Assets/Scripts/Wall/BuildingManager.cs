@@ -15,6 +15,7 @@ public class BuildingManager : MonoBehaviour
     private readonly float offset = 0.098f;
     private readonly float instantiateOffset = 0.252f;
     private readonly string modelName = "Render Model";
+    private readonly string unTag = "Untagged";
     private readonly string gridTag = "Grid";
     private readonly string baseTag = "Base";
     private string containerName;
@@ -31,7 +32,7 @@ public class BuildingManager : MonoBehaviour
     {
         SetupButton("Normal Artillery", "Artillery Instantiation", 50);
         SetupButton("Normal Breakable", "Normal Breakable Instantiation", 30);
-        SetupButton("Poison Breakable", "Poison Breakable Instantiation", 100);
+        SetupButton("Poison Breakable", "Poison Breakable Instantiation", 80);
         SetupButton("Burn Breakable", "Burn Breakable Instantiation", 100);
         raycastLayers = LayerMask.GetMask("Artillery");
     }
@@ -77,6 +78,7 @@ public class BuildingManager : MonoBehaviour
                 Vector3 targetPosition = hit.transform.position + Vector3.up * offset;
                 model = Instantiate(instantiateModel, instantiatePosition, Quaternion.identity);
                 StartCoroutine(Build(model, instantiatePosition, targetPosition));
+                hit.transform.gameObject.tag = unTag;
                 levelBasic.coin -= price;
                 levelBasic.UpdateCoinWallet();
                 isButtonSelected = false;
@@ -88,6 +90,7 @@ public class BuildingManager : MonoBehaviour
                 Vector3 targetPosition = hit.transform.position + Vector3.up * offset;
                 model = Instantiate(instantiateModel, instantiatePosition, Quaternion.identity);
                 StartCoroutine(Build(model, instantiatePosition, targetPosition));
+                hit.transform.gameObject.tag = unTag;
                 levelBasic.coin -= price;
                 levelBasic.UpdateCoinWallet();
                 isButtonSelected = false;

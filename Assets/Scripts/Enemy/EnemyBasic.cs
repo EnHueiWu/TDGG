@@ -28,13 +28,17 @@ public class EnemyBasic : MonoBehaviour
     [Header("該怪物種類")]
     public MonsterType monsterType;
 
-    private Transform nextWaypoint;
+    public Transform nextWaypoint;
     private Animator enemyAnimator;
-    private int poisonCount = 5; // 中毒扣血次數
-    private float attackTime = 1; // 怪物攻擊的時間
-    private float poisonTime = 1; // 中毒扣血時間（每1秒扣1次，共扣5次）
+    public int hitcount = 0;
+    public int routePlanIndex;
+    public int poisonCount = 5; //中毒扣血次數
+    private float attackTime = 1; //怪物攻擊的時間
+    private float poisonTime = 1; //中毒扣血時間（每1秒扣1次，共扣5次）
     private float changeTime = 0.2f;
-    private bool isPoisoning; // 是否中毒
+    public float frozenTime = 0;
+    private float originalSpeed;
+    public bool isPoisoning; //是否中毒
     private bool isColorChange = false;
     private bool isSetOriginalColor = false;
     private readonly string bulletLayer = "Bullet";
@@ -46,11 +50,12 @@ public class EnemyBasic : MonoBehaviour
         levelBasic = FindObjectOfType<LevelBasic>();
         HP = data.HP;
         speed = data.speed;
+        originalSpeed = data.speed;
+        originalColor = gameObject.GetComponent<MeshRenderer>().material.color;
     }
 
     private void Start()
     {
-        nextWaypoint = RoutePlanA.pointA[0]; // 目標 = 路徑點
         enemyAnimator = GetComponent<Animator>();
     }
 
@@ -63,10 +68,15 @@ public class EnemyBasic : MonoBehaviour
         }
         #endregion
 
-        Vector3 dir = nextWaypoint.position - transform.position;
-        transform.parent.Translate(speed * Time.deltaTime * dir.normalized, Space.World); // 移動 要改速度改speed即可
+        if (gameObject.transform.localPosition != Vector3.zero)
+        {
+            gameObject.transform.localPosition = Vector3.zero;
+        }
 
-        if (Vector3.Distance(transform.parent.position, nextWaypoint.position) <= 0.002f) // 換下一個路徑點
+        Vector3 dir = nextWaypoint.position - transform.position;
+        transform.parent.Translate(speed * Time.deltaTime * dir.normalized, Space.World); //移動 要改速度改speed即可
+
+        if (Vector3.Distance(transform.parent.position, nextWaypoint.position) <= 0.002f) //換下一個路徑點
         {
             GetNextWaypoint();
         }
@@ -76,15 +86,15 @@ public class EnemyBasic : MonoBehaviour
             Dead();
         }
 
-        if (isPoisoning) // 敵人中毒
+        //敵人中毒
+        if (isPoisoning)
         {
             poisonTime -= Time.deltaTime;
-            ChangeEnemyColor(gameObject, new Color(0.6f, 0.2f, 0.6f, 1));
-            // Debug.Log("time" + PoisonTime);
+            ChangeEnemyColor(gameObject, new Color(0.6f, 0.2f, 0.6f, 1f));
+ 
             if (poisonTime <= 0)
             {
                 HP -= 5;
-                //Debug.Log("Current HP of " + gameObject.ToString() + " is " + HP);
                 poisonCount -= 1;
                 poisonTime = 1;
             }
@@ -98,9 +108,22 @@ public class EnemyBasic : MonoBehaviour
             }
         }
 
-        if (isColorChange) // 顏色改變（敵人受傷）
+        if (frozenTime > 0)
+        {
+            frozenTime -= Time.deltaTime;
+            ChangeEnemyColor(gameObject, new Color(0.55f, 0.75f, 1f, 1f));
+        }
+
+        else
+        {
+            speed = originalSpeed;
+            ChangeEnemyColor(gameObject, originalColor);
+        }
+
+        if (isColorChange) //顏色改變（敵人受傷）
         {
             changeTime -= Time.deltaTime;
+
             if (changeTime <= 0)
             {
                 ChangeEnemyColor(gameObject, originalColor);
@@ -110,7 +133,7 @@ public class EnemyBasic : MonoBehaviour
             }
         }
 
-        // 轉向判斷
+        //轉向判斷
         if (gameObject.transform.parent.position.x - nextWaypoint.transform.position.x > 0.002)
         {
             gameObject.transform.parent.rotation = Quaternion.Euler(0f, 90f, 0f);
@@ -134,26 +157,80 @@ public class EnemyBasic : MonoBehaviour
 
     public void GetNextWaypoint()
     {
-        if (wavepointIndex >= RoutePlanA.pointA.Length - 1) // 到達核心就消失（目前）
+        switch (routePlanIndex)
         {
-            if (monsterType == MonsterType.Boss)
-            {
-                levelBasic.coreHP -= 10;
-                levelBasic.UpdateCoreHP();
-                Destroy(transform.parent.gameObject);
-            }
+            case 0:
+                if (wavepointIndex >= RoutePlanA.pointA.Length - 1)
+                {
+                    if (monsterType == MonsterType.Boss)
+                    {
+                        levelBasic.coreHP -= 10;
+                        levelBasic.UpdateCoreHP();
+                        Destroy(transform.parent.gameObject);
+                    }
 
-            else
-            {
-                levelBasic.coreHP--;
-                levelBasic.UpdateCoreHP();
-                Destroy(transform.parent.gameObject);
-            }
-            return;
+                    else
+                    {
+                        levelBasic.coreHP--;
+                        levelBasic.UpdateCoreHP();
+                        Destroy(transform.parent.gameObject);
+                    }
+
+                    return;
+                }
+
+                wavepointIndex++;
+                nextWaypoint = RoutePlanA.pointA[wavepointIndex];
+                break;
+            
+            case 1:
+                if (wavepointIndex >= RoutePlanB.pointB.Length - 1)
+                {
+                    if (monsterType == MonsterType.Boss)
+                    {
+                        levelBasic.coreHP -= 10;
+                        levelBasic.UpdateCoreHP();
+                        Destroy(transform.parent.gameObject);
+                    }
+
+                    else
+                    {
+                        levelBasic.coreHP--;
+                        levelBasic.UpdateCoreHP();
+                        Destroy(transform.parent.gameObject);
+                    }
+
+                    return;
+                }
+
+                wavepointIndex++;
+                nextWaypoint = RoutePlanB.pointB[wavepointIndex];
+                break;
+
+            case 2:
+                if (wavepointIndex >= RoutePlanC.pointC.Length - 1)
+                {
+                    if (monsterType == MonsterType.Boss)
+                    {
+                        levelBasic.coreHP -= 10;
+                        levelBasic.UpdateCoreHP();
+                        Destroy(transform.parent.gameObject);
+                    }
+
+                    else
+                    {
+                        levelBasic.coreHP--;
+                        levelBasic.UpdateCoreHP();
+                        Destroy(transform.parent.gameObject);
+                    }
+
+                    return;
+                }
+
+                wavepointIndex++;
+                nextWaypoint = RoutePlanC.pointC[wavepointIndex];
+                break;
         }
-
-        wavepointIndex++;
-        nextWaypoint = RoutePlanA.pointA[wavepointIndex];
     }
 
     public void Dead()
@@ -181,21 +258,17 @@ public class EnemyBasic : MonoBehaviour
 
         else if (monsterType == MonsterType.Boss)
         {
-            //print("我打敗Boss了，我可以通關了");
             levelBasic.winPanel.SetActive(true);
+
+            if (levelBasic.countdownText.gameObject.activeSelf)
+                levelBasic.countdownText.gameObject.SetActive(false);
             Time.timeScale = 0f;
             Destroy(transform.parent.gameObject);
         }
     }
 
-    public void OnCollisionEnter(Collision other) // 碰撞
+    public void OnCollisionStay(Collision other) //碰撞
     {
-        //Debug.Log("觸發碰撞事件");
-    }
-
-    public void OnCollisionStay(Collision other) // 碰撞
-    {
-        //Debug.Log("持續碰撞" + other.gameObject);
         if (other.gameObject.layer != LayerMask.NameToLayer(bulletLayer))
         {
             enemyAnimator.SetBool("Attack", true);
@@ -206,6 +279,7 @@ public class EnemyBasic : MonoBehaviour
             originalColor = gameObject.GetComponent<MeshRenderer>().material.color;
             isSetOriginalColor = true;
         }
+
         attackTime -= Time.deltaTime;
 
         if (attackTime <= 0 && other.gameObject.layer == LayerMask.NameToLayer(breakableWallLayer))
@@ -220,15 +294,18 @@ public class EnemyBasic : MonoBehaviour
                     isColorChange = true;
                     attackTime = 1;
                     break;
+
                 case "Poison":
                     isPoisoning = true;
                     poisonCount = 5;
                     other.gameObject.GetComponent<WallManager>().HP -= 1;
                     break;
+
                 case "Normal":
                     other.gameObject.GetComponent<WallManager>().HP -= 1;
                     break;
             }
+
             attackTime = 1;
             enemyAnimator.SetBool("Attack", false);
         }
@@ -256,6 +333,7 @@ public class EnemyBasic : MonoBehaviour
 
             case "SpeedMinion(Clone)":
                 enemy.GetComponent<MeshRenderer>().material.color = color;
+                
                 for (int i = 1; i <= 2; i++)
                 {
                     enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
@@ -264,6 +342,7 @@ public class EnemyBasic : MonoBehaviour
 
             case "DefenseMinion(Clone)":
                 enemy.GetComponent<MeshRenderer>().material.color = color;
+                
                 for (int i = 1; i <= 3; i++)
                 {
                     enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
@@ -276,6 +355,7 @@ public class EnemyBasic : MonoBehaviour
 
             case "SpeedElite(Clone)":
                 enemy.GetComponent<MeshRenderer>().material.color = color;
+                
                 for (int i = 1; i <= 2; i++)
                 {
                     enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
@@ -284,6 +364,7 @@ public class EnemyBasic : MonoBehaviour
 
             case "DefenseElite(Clone)":
                 enemy.GetComponent<MeshRenderer>().material.color = color;
+                
                 for (int i = 1; i <= 3; i++)
                 {
                     enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
@@ -292,6 +373,7 @@ public class EnemyBasic : MonoBehaviour
 
             case "AttackSupreme(Clone)":
                 enemy.GetComponent<MeshRenderer>().material.color = color;
+                
                 for (int i = 1; i <= 8; i++)
                 {
                     enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
@@ -300,6 +382,7 @@ public class EnemyBasic : MonoBehaviour
 
             case "SpeedSupreme(Clone)":
                 enemy.GetComponent<MeshRenderer>().material.color = color;
+                
                 for (int i = 1; i <= 3; i++)
                 {
                     enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
@@ -308,6 +391,7 @@ public class EnemyBasic : MonoBehaviour
 
             case "DefenseSupreme(Clone)":
                 enemy.GetComponent<MeshRenderer>().material.color = color;
+                
                 for (int i = 1; i <= 6; i++)
                 {
                     enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
@@ -316,6 +400,7 @@ public class EnemyBasic : MonoBehaviour
 
             case "AttackBoss(Clone)":
                 enemy.GetComponent<MeshRenderer>().material.color = color;
+                
                 for (int i = 1; i <= 8; i++)
                 {
                     enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
@@ -324,6 +409,7 @@ public class EnemyBasic : MonoBehaviour
 
             case "SpeedBoss(Clone)":
                 enemy.GetComponent<MeshRenderer>().material.color = color;
+                
                 for (int i = 1; i <= 3; i++)
                 {
                     enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;
@@ -332,6 +418,7 @@ public class EnemyBasic : MonoBehaviour
 
             case "DefenseBoss(Clone)":
                 enemy.GetComponent<MeshRenderer>().material.color = color;
+                
                 for (int i = 1; i <= 6; i++)
                 {
                     enemy.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = color;

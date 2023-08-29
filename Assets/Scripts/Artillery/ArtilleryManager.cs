@@ -9,8 +9,6 @@ public class ArtilleryManager : MonoBehaviour
     public int price;
     private readonly string enemyLayer = "Monster";
     private readonly string rotatorTag = "Rotator";
-    private readonly float shootInterval = .1f;
-    private readonly float bulletSpeed = 1f;
     private bool isShooting = false;
 
     private void OnTriggerEnter(Collider other)
@@ -54,7 +52,7 @@ public class ArtilleryManager : MonoBehaviour
             GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
             StartCoroutine(MoveBullet(bullet, direction));
 
-            yield return new WaitForSeconds(shootInterval);
+            yield return new WaitForSeconds(bullet.GetComponent<BulletManager>().shootInterval);
         }
 
         isShooting = false;
@@ -64,7 +62,7 @@ public class ArtilleryManager : MonoBehaviour
     {
         while (bullet != null && !bullet.GetComponent<BulletManager>().isHit)
         {
-            bullet.transform.Translate(bulletSpeed * Time.deltaTime * direction.normalized);
+            bullet.transform.Translate(bullet.GetComponent<BulletManager>().bulletSpeed * Time.deltaTime * direction.normalized);
             yield return null;
         }
     }

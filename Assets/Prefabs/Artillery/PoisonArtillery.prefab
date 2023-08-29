@@ -105,7 +105,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.15
+  m_Radius: 0.27
   m_Height: 0.55
   m_Direction: 1
   m_Center: {x: 0, y: -0.35, z: 0}
@@ -148,7 +148,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4059743de141a3f47ad743054da3855b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: fc7ad805c8a47be4db526325984158ed, type: 2}
   bulletPrefab: {fileID: 3653768653190079916, guid: 142c75f6ca918f44082ff55761692fe8, type: 3}
-  enemyList: []
-  price: 40
+  price: 30

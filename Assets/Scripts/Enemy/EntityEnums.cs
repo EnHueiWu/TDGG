@@ -30,3 +30,13 @@ public enum WallType
     PoisonWall,
     NormalWall
 }
+
+//子彈種類
+public enum BulletType
+{
+    None,
+    NormalBullet,
+    AdvancedBullet,
+    PoisonBullet,
+    IceBullet
+}

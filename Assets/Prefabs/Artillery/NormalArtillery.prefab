@@ -171,8 +171,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4059743de141a3f47ad743054da3855b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  artilleryType: 1
   bulletPrefab: {fileID: 3653768653190079916, guid: b0704640de7d24c4ea1eca23d6dd7221, type: 3}
-  enemyList: []
   price: 50
 --- !u!114 &133771366959671637
 MonoBehaviour:
