@@ -125,7 +125,7 @@ public class LevelBasic : MonoBehaviour
     [Header("當每種怪物數量>0時該處便會擁有陣列")]
     public List<int> availableEnemies = new();
 
-    private List<GameObject> spawnPortals = new();
+    private readonly List<GameObject> spawnPortals = new();
     private float[] enemySpawnProbabilities;
     private float countdownTime = 10f;
     private readonly float moveDuration = 0.5f;
