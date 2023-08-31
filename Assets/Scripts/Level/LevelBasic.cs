@@ -482,7 +482,7 @@ public class LevelBasic : MonoBehaviour
 
                     if (ShouldSpawnSupreme(currentWave) && !isSpawnedSupreme) //檢查是否需要生成小Boss
                     {
-                        Debug.LogWarning("我有生成小Boss喔");
+                        //Debug.LogWarning("我有生成小Boss喔");
                         GameObject supremePrefab = GetSupremePrefabForWave(currentWave);
                         InstantiateEnemy(supremePrefab, spawnPosition, nextWaypoint, routePlanIndex);
                         isSpawnedSupreme = true;
