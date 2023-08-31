@@ -6,7 +6,7 @@ using UnityEngine;
 public class BulletManager : MonoBehaviour
 {
     public BulletType bulletType;
-    public GameObject effect;
+    public GameObject[] effect;
     public float shootInterval, bulletSpeed, damage;
     private const string monsterLayer = "Monster";
     private const string floorTag = "Floor";
@@ -57,12 +57,13 @@ public class BulletManager : MonoBehaviour
 
     private bool IsMonsterHit(Collider other)
     {
-        return other.gameObject.layer == LayerMask.NameToLayer(monsterLayer) && other.TryGetComponent(out EnemyBasic _);
+        return other.gameObject.layer == LayerMask.NameToLayer(monsterLayer) && other.TryGetComponent(out EnemyManager _);
     }
 
     private void HitMonster(Collider other)
     {
-        EnemyBasic enemy = other.GetComponent<EnemyBasic>();
+        EnemyManager enemy = other.GetComponent<EnemyManager>();
+        GameObject effect = new();
 
         switch (bulletType)
         {
@@ -72,7 +73,7 @@ public class BulletManager : MonoBehaviour
 
             case BulletType.AdvancedBullet:
                 enemy.HP -= damage * enemy.hitcount;
-                enemy.hitcount++;
+                if (enemy.hitcount < 10) enemy.hitcount++;
                 break;
 
             case BulletType.PoisonBullet:
@@ -88,7 +89,18 @@ public class BulletManager : MonoBehaviour
                 break;
         }
 
-        var effect = Instantiate(this.effect, other.transform.position, Quaternion.identity);
+        if (bulletType == BulletType.AdvancedBullet)
+        {
+            if (enemy.hitcount <= 4) effect = Instantiate(this.effect[0], other.transform.position, Quaternion.identity);
+
+            else if (enemy.hitcount <= 9) effect = Instantiate(this.effect[1], other.transform.position, Quaternion.identity);
+
+            else if (enemy.hitcount > 9) effect = Instantiate(this.effect[2], other.transform.position, Quaternion.identity);
+        }
+
+        else
+            effect = Instantiate(this.effect[0], other.transform.position, Quaternion.identity);
+
         Destroy(gameObject);
         Destroy(effect, 1f);
         isHit = true;

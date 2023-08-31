@@ -11,7 +11,6 @@ public class BuildingManager : MonoBehaviour
     private Button instantiateButton;
     private LayerMask raycastLayers;
     private int price;
-    private readonly float moveDuration = 0.5f;
     private readonly float offset = 0.098f;
     private readonly float instantiateOffset = 0.252f;
     private readonly string modelName = "Render Model";
@@ -51,10 +50,7 @@ public class BuildingManager : MonoBehaviour
             }
         }
 
-        else
-        {
-            instantiateButton.interactable = false;
-        }
+        else instantiateButton.interactable = false;
     }
 
     private void SetupButton(string targetContainerName, string buttonName, int buttonPrice)
@@ -77,45 +73,28 @@ public class BuildingManager : MonoBehaviour
                 Vector3 instantiatePosition = hit.transform.position + Vector3.up * instantiateOffset;
                 Vector3 targetPosition = hit.transform.position + Vector3.up * offset;
                 model = Instantiate(instantiateModel, instantiatePosition, Quaternion.identity);
-                StartCoroutine(Build(model, instantiatePosition, targetPosition));
+                StartCoroutine(levelBasic.Build(model, instantiatePosition, targetPosition));
                 hit.transform.gameObject.tag = unTag;
                 levelBasic.coin -= price;
                 levelBasic.UpdateCoinWallet();
                 isButtonSelected = false;
             }
 
-            else if (containerName.Contains("Breakable") && hit.transform.gameObject.CompareTag(gridTag))
+            else if (containerName.Contains("Breakable") && hit.transform.gameObject.CompareTag(gridTag) && !hit.transform.gameObject.GetComponent<HoverAnimation>().isBulit)
             {
                 Vector3 instantiatePosition = hit.transform.position;
                 Vector3 targetPosition = hit.transform.position + Vector3.up * offset;
                 model = Instantiate(instantiateModel, instantiatePosition, Quaternion.identity);
-                StartCoroutine(Build(model, instantiatePosition, targetPosition));
-                hit.transform.gameObject.tag = unTag;
+                StartCoroutine(levelBasic.Build(model, instantiatePosition, targetPosition));
+                hit.transform.gameObject.GetComponent<HoverAnimation>().isBulit = true;
+                model.GetComponent<WallManager>().builtGrid = hit.transform.gameObject;
                 levelBasic.coin -= price;
                 levelBasic.UpdateCoinWallet();
                 isButtonSelected = false;
             }
         }
 
-        else
-        {
-            isButtonSelected = false;
-        }
-    }
-
-    private IEnumerator Build(GameObject model, Vector3 instantiatePosition, Vector3 targetPosition)
-    {
-        float elapsedTime = 0f;
-
-        while (elapsedTime < moveDuration)
-        {
-            float time = elapsedTime / moveDuration;
-            model.transform.position = Vector3.Lerp(instantiatePosition, targetPosition, time);
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        model.transform.position = targetPosition;
+        else isButtonSelected = false;
     }
 
     public void SelectAndUpdateSelected(BaseEventData eventData)

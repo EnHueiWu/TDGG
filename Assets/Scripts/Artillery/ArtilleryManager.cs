@@ -5,7 +5,7 @@ using UnityEngine;
 public class ArtilleryManager : MonoBehaviour
 {
     public GameObject bulletPrefab;
-    private List<GameObject> enemyList = new();
+    private readonly List<GameObject> enemyList = new();
     public int price;
     private readonly string enemyLayer = "Monster";
     private readonly string rotatorTag = "Rotator";
@@ -13,31 +13,19 @@ public class ArtilleryManager : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer(enemyLayer) && !other.CompareTag(rotatorTag))
-        {
-            enemyList.Add(other.gameObject);
-        }
+        if (other.gameObject.layer == LayerMask.NameToLayer(enemyLayer) && !other.CompareTag(rotatorTag)) enemyList.Add(other.gameObject);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer(enemyLayer) && !other.CompareTag(rotatorTag))
-        {
-            enemyList.Remove(other.gameObject);
-        }
+        if (other.gameObject.layer == LayerMask.NameToLayer(enemyLayer) && !other.CompareTag(rotatorTag)) enemyList.Remove(other.gameObject);
     }
 
     private void Update()
     {
-        if (enemyList.Count > 0 && !isShooting)
-        {
-            StartCoroutine(Shoot());
-        }
+        if (enemyList.Count > 0 && !isShooting) StartCoroutine(Shoot());
 
-        if (enemyList.Count > 0 && enemyList[0] == null)
-        {
-            enemyList.Remove(enemyList[0]);
-        }
+        if (enemyList.Count > 0 && enemyList[0] == null) enemyList.Remove(enemyList[0]);
     }
 
     private IEnumerator Shoot()

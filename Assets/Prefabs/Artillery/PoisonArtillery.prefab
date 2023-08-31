@@ -149,4 +149,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 3653768653190079916, guid: 142c75f6ca918f44082ff55761692fe8, type: 3}
-  price: 30
+  price: 100

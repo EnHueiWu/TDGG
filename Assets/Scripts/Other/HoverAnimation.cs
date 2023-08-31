@@ -9,6 +9,7 @@ public class HoverAnimation : MonoBehaviour
     private LayerMask raycastLayers;
     private Color originalColor;
     private static Color hoverColor;
+    public bool isBulit = false;
     private bool isMouseEnter = false;
     private static bool isAnyButtonSelected;
     private readonly string gridLayer = "Grid";
@@ -26,10 +27,7 @@ public class HoverAnimation : MonoBehaviour
             isAnyButtonSelected = buildingManager.isButtonSelected;
         }
 
-        else
-        {
-            isAnyButtonSelected = false;
-        }
+        else isAnyButtonSelected = false;
     }
 
     private void Start()
@@ -45,21 +43,12 @@ public class HoverAnimation : MonoBehaviour
         
         if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, ~raycastLayers))
         {
-            if (hit.collider.gameObject == gameObject && !isMouseEnter)
-            {
-                OnRaycastEnter(hit);
-            }
+            if (hit.collider.gameObject == gameObject && !isMouseEnter) OnRaycastEnter(hit);
 
-            else if (hit.collider.gameObject != gameObject && isMouseEnter)
-            {
-                OnRaycastExit();
-            }
+            else if (hit.collider.gameObject != gameObject && isMouseEnter) OnRaycastExit();
         }
 
-        else if (isMouseEnter)
-        {
-            OnRaycastExit();
-        }
+        else if (isMouseEnter) OnRaycastExit();
     }
 
     private void OnRaycastEnter(RaycastHit hit)
@@ -69,14 +58,10 @@ public class HoverAnimation : MonoBehaviour
             isMouseEnter = true;
 
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer(unbreakableWallLayer) && hoveredInterlocking.layer == LayerMask.NameToLayer(artilleryLayer))
-            {
                 interlockingRenderer.material.color = hoverColor;
-            }
 
             else if (hit.collider.gameObject.layer == LayerMask.NameToLayer(gridLayer) && hoveredInterlocking.layer == LayerMask.NameToLayer(breakableWallLayer))
-            {
                 interlockingRenderer.material.color = hoverColor;
-            }
         }
     }
 

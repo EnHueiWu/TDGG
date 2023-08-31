@@ -5,6 +5,7 @@ using UnityEngine;
 public class WallManager : MonoBehaviour
 {
     public WallType wallType;
+    public GameObject builtGrid;
     public int HP;
 
     private void Awake()
@@ -31,6 +32,10 @@ public class WallManager : MonoBehaviour
 
     private void Update()
     {
-        if (HP <= 0) Destroy(gameObject);
+        if (HP <= 0)
+        {
+            Destroy(gameObject);
+            builtGrid.GetComponent<HoverAnimation>().isBulit = false;
+        }
     }
 }

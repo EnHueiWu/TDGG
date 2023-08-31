@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 0928ec34cd44c4c438d2b794cfcc0796, type: 2}
+  - {fileID: 2100000, guid: aca7501c7da292e40b42f430ebcfa33f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -156,7 +156,7 @@ TrailRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 737e1231e40aaed42b40dda6ab440111, type: 2}
+  - {fileID: 2100000, guid: a9485855d126d0d40bb2cf7ae6691df8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -252,7 +252,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletType: 3
-  effect: {fileID: 2333597752148496740, guid: b177800f7ab63434f8de88c2c8b5f5fd, type: 3}
+  effect:
+  - {fileID: 5515965470801437954, guid: b0a7ef182dac98746be601e8a03cfdf7, type: 3}
   shootInterval: 0
   bulletSpeed: 0
   damage: 0
